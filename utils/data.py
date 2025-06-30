@@ -2,10 +2,10 @@ import os
 import pandas as pd
 import alpaca_trade_api as tradeapi
 
-# Configuración Alpaca
 ALPACA_KEY = os.getenv("ALPACA_KEY")
 ALPACA_SECRET = os.getenv("ALPACA_SECRET")
 BASE_URL = "https://paper-api.alpaca.markets"
+
 api = tradeapi.REST(ALPACA_KEY, ALPACA_SECRET, base_url=BASE_URL)
 
 def obtener_datos(ticker, limit=150, timeframe="5Min"):
