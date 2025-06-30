@@ -185,21 +185,24 @@ def evaluar_ruptura_en_fecha(ticker, fecha_str, hora_str="11:20", timeframe="5Mi
         print(f"⚠️ Error en evaluación histórica: {e}", flush=True)
 def escanear_dia_historico(tickers, fecha_str="2025-06-28", timeframe="5Min", enviar_por_telegram=True):
     """
-    Recorre un día completo del pasado y muestra todas las señales confirmadas por ruptura + MACD multiframe.
+    Escanea un día específico entre 09:48 y 14:00 buscando señales confirmadas.
     """
     print(f"\n📅 Escaneando señales del {fecha_str}...\n", flush=True)
     total_senales = 0
 
     try:
-        fecha_base = NY_TZ.localize(datetime.strptime(fecha_str, "%Y-%m-%d"))
+        fecha_base = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+        inicio_dt = NY_TZ.localize(datetime.combine(fecha_base, dtime(9, 30)))
+        fin_dt = NY_TZ.localize(datetime.combine(fecha_base, dtime(14, 0)))
+
         horas = [dtime(h, m) for h in range(9, 15) for m in range(0, 60, 5)]
-        momentos = [NY_TZ.localize(datetime.combine(fecha_base.date(), h)) for h in horas if h >= dtime(9, 48) and h < dtime(14, 0)]
+        momentos = [NY_TZ.localize(datetime.combine(fecha_base, h)) for h in horas if dtime(9, 48) <= h < dtime(14, 0)]
 
         for ticker in tickers:
             print(f"\n🔍 {ticker}:", flush=True)
-            bars = api.get_bars(ticker, timeframe=timeframe, limit=1000).df
+            bars = api.get_bars(ticker, timeframe=timeframe, start=inicio_dt.isoformat(), end=fin_dt.isoformat()).df
             if bars.empty:
-                print("⛔ Sin datos históricos.", flush=True)
+                print("⛔ Sin datos históricos para ese rango.", flush=True)
                 continue
 
             df = bars[['open', 'high', 'low', 'close', 'volume']].copy()
