@@ -5,7 +5,6 @@ services:
     repo: https://github.com/LEONARDOSUSA/trading-bot-estrategia-macd
     buildCommand: |
       pip install -r requirements.txt
-      pip install .
     startCommand: python trading_loop.py
     region: oregon
     plan: free
@@ -18,3 +17,6 @@ services:
         sync: false
       - key: TELEGRAM_CHAT_ID
         sync: false
+    build:
+      environment:
+        pythonVersion: 3.11.9
