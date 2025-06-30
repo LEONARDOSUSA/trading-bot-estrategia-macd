@@ -2,12 +2,13 @@ import os
 import sys
 import time
 from datetime import datetime, time as dtime
+from pytz import timezone
 
 from utils.telegram import enviar_mensaje
 print("📍 Inicio alcanzado", flush=True)
 
 def notificar_inicio():
-    hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    hora_actual = datetime.now(NY_TZ).strftime("%Y-%m-%d %H:%M:%S")
     mensaje = f"✅ Bot MACD activo desde {hora_actual}. Escaneando rupturas intradía..."
     print("🟡 Ejecutando notificar_inicio()", flush=True)
     print(mensaje, flush=True)
@@ -17,26 +18,27 @@ def notificar_inicio():
     except Exception as e:
         print(f"🔴 Error al enviar mensaje: {e}", flush=True)
 
-# 🧭 Rutas relativas para importaciones
+# 🧭 Rutas relativas
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from estrategias.macd_breakout import evaluar_ruptura
 from utils.data import obtener_datos
 
-# Horario operativo
-HORA_INICIO = dtime(9, 48)   # 09:48 AM NY
-HORA_CORTE  = dtime(14, 0)   # 02:00 PM NY
+# Zona horaria NY
+NY_TZ = timezone('America/New_York')
 
-# Lista de tickers a monitorear
+# Horario operativo NY
+HORA_INICIO = dtime(9, 48)
+HORA_CORTE  = dtime(14, 0)
+
 tickers_activos = ["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"]
 
-# ✅ Notificación de arranque
 notificar_inicio()
 
-# Loop principal
 print("🚀 Bot iniciado, esperando ventana operativa...", flush=True)
+
 while True:
-    ahora = datetime.now().time()
+    ahora = datetime.now(NY_TZ).time()
 
     if ahora < HORA_INICIO:
         time.sleep(30)
@@ -61,5 +63,3 @@ while True:
             print(f"⚠️ Error con {ticker}: {e}", flush=True)
 
     time.sleep(60)
-
-                
