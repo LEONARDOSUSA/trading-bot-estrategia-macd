@@ -1,5 +1,6 @@
-alpaca-trade-api==3.2.0
 pandas
-requests
+alpaca-trade-api
 ta
 pytz
+requests
+python-telegram-bot
