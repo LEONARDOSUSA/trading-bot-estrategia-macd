@@ -3,8 +3,7 @@ services:
     name: trading-bot-macd
     runtime: python
     repo: https://github.com/LEONARDOSUSA/trading-bot-estrategia-macd
-    buildCommand: |
-      pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: python trading_loop.py
     region: oregon
     plan: free
