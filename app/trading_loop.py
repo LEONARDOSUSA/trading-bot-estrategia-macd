@@ -15,7 +15,7 @@ HORA_INICIO = dtime(9, 48)   # 09:48 AM NY
 HORA_CORTE  = dtime(14, 0)   # 02:00 PM NY
 
 # Lista de tickers a monitorear (puedes personalizarla)
-tickers_activos = ["AAPL", "TSLA", "MSFT", "NVDA", "AMD", "META"]
+tickers_activos = ["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"]
 
 # Loop principal
 print("🚀 Bot iniciado, esperando ventana operativa...")
