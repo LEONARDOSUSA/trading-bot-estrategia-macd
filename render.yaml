@@ -1,6 +1,6 @@
 services:
-  - type: web
-    name: trading-bot
+  - type: worker
+    name: trading-bot-macd
     runtime: python
     repo: https://github.com/LEONARDOSUSA/trading-bot-estrategia-macd
     buildCommand: |
