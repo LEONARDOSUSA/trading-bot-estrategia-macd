@@ -5,7 +5,19 @@ from datetime import datetime, time as dtime
 from pytz import timezone
 
 from utils.telegram import enviar_mensaje
+from estrategias.evaluar_ruptura import evaluar_ruptura  # ✅ NUEVO EVALUADOR
+from utils.data import obtener_datos
+
 print("📍 Inicio alcanzado", flush=True)
+
+# Zona horaria NY
+NY_TZ = timezone('America/New_York')
+
+# Horarios operativos (NY Time)
+HORA_INICIO = dtime(9, 48)
+HORA_CORTE = dtime(14, 0)
+
+tickers_activos = ["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"]
 
 def notificar_inicio():
     hora_actual = datetime.now(NY_TZ).strftime("%Y-%m-%d %H:%M:%S")
@@ -17,21 +29,6 @@ def notificar_inicio():
         print("🟢 Mensaje enviado con éxito.", flush=True)
     except Exception as e:
         print(f"🔴 Error al enviar mensaje: {e}", flush=True)
-
-# 🧭 Rutas relativas
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from estrategias.macd_breakout import evaluar_ruptura
-from utils.data import obtener_datos
-
-# Zona horaria NY
-NY_TZ = timezone('America/New_York')
-
-# Horario operativo NY
-HORA_INICIO = dtime(9, 48)
-HORA_CORTE  = dtime(14, 0)
-
-tickers_activos = ["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"]
 
 notificar_inicio()
 
@@ -51,12 +48,12 @@ while True:
 
     for ticker in tickers_activos[:]:
         try:
-            df = obtener_datos(ticker)
+            df = obtener_datos(ticker, limit=150, timeframe="5Min")
             señal = evaluar_ruptura(ticker, df)
 
             if señal:
                 print(f"📊 Señal detectada en {ticker}", flush=True)
-                enviar_mensaje(f"📢 Señal encontrada: {señal}")
+                enviar_mensaje(señal)
                 tickers_activos.remove(ticker)
 
         except Exception as e:
