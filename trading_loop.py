@@ -4,7 +4,7 @@ import time
 from datetime import datetime, time as dtime
 
 from utils.telegram import enviar_mensaje
-
+print("📍 Inicio alcanzado")
 def notificar_inicio():
     hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mensaje = f"✅ Bot MACD activo desde {hora_actual}. Escaneando rupturas intradía..."
