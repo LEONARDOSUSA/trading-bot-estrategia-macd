@@ -1,36 +1,65 @@
+import os
 import pandas as pd
+import alpaca_trade_api as tradeapi
 import ta
+import pytz
+from datetime import timedelta
 
-def evaluar_ruptura(ticker, df):
+# Config Alpaca
+ALPACA_KEY = os.getenv("ALPACA_KEY")
+ALPACA_SECRET = os.getenv("ALPACA_SECRET")
+BASE_URL = "https://paper-api.alpaca.markets"
+api = tradeapi.REST(ALPACA_KEY, ALPACA_SECRET, base_url=BASE_URL)
+
+def obtener_macd_cruce(ticker, timeframe, momento, direccion="CALL"):
     try:
-        if len(df) < 35:
-            print(f"⏳ No hay suficientes datos para {ticker} ({len(df)} velas)", flush=True)
-            return None
+        ny_tz = pytz.timezone("America/New_York")
+        fin = momento.astimezone(ny_tz)
+        inicio = fin - _delta_timeframe(timeframe, 100)
 
-        macd = ta.trend.MACD(close=df['close'], window_slow=26, window_fast=12, window_sign=9)
-        df['macd'] = macd.macd()
-        df['signal'] = macd.macd_signal()
+        bars = api.get_bars(
+            symbol=ticker,
+            timeframe=timeframe,
+            start=inicio.isoformat(),
+            end=fin.isoformat()
+        ).df
 
-        macd_actual = df['macd'].iloc[-1]
-        signal_actual = df['signal'].iloc[-1]
-        macd_prev = df['macd'].iloc[-2]
-        signal_prev = df['signal'].iloc[-2]
-        precio = df['close'].iloc[-1]
+        if bars.empty or len(bars) < 35:
+            return False
 
-        if macd_prev < signal_prev and macd_actual > signal_actual:
-            mensaje = (
-                f"📈 Ruptura detectada: {ticker}\n"
-                f"🟢 Tipo: CALL (MACD cruzando al alza)\n"
-                f"💵 Precio de disparo: ${precio:.2f}\n"
-                f"🕒 Timeframe: 5Min"
-            )
-            print(f"📊 Señal detectada en {ticker}", flush=True)
-            return mensaje
+        df = bars[['close']].copy()
+        macd = ta.trend.MACD(df["close"])
+        df["macd"] = macd.macd()
+        df["signal"] = macd.macd_signal()
+
+        m0, m1 = df["macd"].iloc[-2], df["macd"].iloc[-1]
+        s0, s1 = df["signal"].iloc[-2], df["signal"].iloc[-1]
+
+        if direccion == "CALL":
+            return m0 < s0 and m1 > s1
         else:
-            print(f"🔍 Sin señal clara en {ticker}", flush=True)
-            return None
+            return m0 > s0 and m1 < s1
 
     except Exception as e:
-        print(f"❌ Error en evaluación de {ticker}: {e}", flush=True)
-        return None
-  
+        print(f"⚠️ Error MACD {timeframe} en {ticker}: {e}", flush=True)
+        return False
+
+def confirmar_macd_multiframe(ticker, momento, direccion):
+    timeframes = ["1Min", "5Min", "15Min"]
+    resultados = {}
+
+    for tf in timeframes:
+        resultados[tf] = obtener_macd_cruce(ticker, tf, momento, direccion)
+
+    resultados["alineados"] = all(resultados.values())
+    return resultados
+
+def _delta_timeframe(tf_str, n):
+    if tf_str == "1Min":
+        return timedelta(minutes=n)
+    elif tf_str == "5Min":
+        return timedelta(minutes=5 * n)
+    elif tf_str == "15Min":
+        return timedelta(minutes=15 * n)
+    else:
+        return timedelta(minutes=60)
