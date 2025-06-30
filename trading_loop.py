@@ -183,7 +183,43 @@ def evaluar_ruptura_en_fecha(ticker, fecha_str, hora_str="11:20", timeframe="5Mi
 
     except Exception as e:
         print(f"⚠️ Error en evaluación histórica: {e}", flush=True)
+def escanear_dia_historico(tickers, fecha_str="2025-06-28", timeframe="5Min", enviar_por_telegram=True):
+    """
+    Recorre un día completo del pasado y muestra todas las señales confirmadas por ruptura + MACD multiframe.
+    """
+    print(f"\n📅 Escaneando señales del {fecha_str}...\n", flush=True)
+    try:
+        fecha_base = NY_TZ.localize(datetime.strptime(fecha_str, "%Y-%m-%d"))
+        horas = [dtime(h, m) for h in range(9, 15) for m in range(0, 60, 5)]
+        momentos = [datetime.combine(fecha_base.date(), h) for h in horas]
+        momentos = [NY_TZ.localize(m) for m in momentos if h >= dtime(9, 48) and h < dtime(14, 0)]
 
+        for ticker in tickers:
+            print(f"\n🔍 {ticker}", flush=True)
+            bars = api.get_bars(ticker, timeframe=timeframe, limit=1000).df
+            if bars.empty:
+                print("⛔ Sin datos")
+                continue
+
+            df = bars[['open', 'high', 'low', 'close', 'volume']].copy()
+            df.index = df.index.tz_convert(NY_TZ)
+
+            for momento in momentos:
+                df_filtrado = df[df.index <= momento]
+                if len(df_filtrado) < 35:
+                    continue
+
+                señal = evaluar_ruptura(ticker, df_filtrado)
+                if señal:
+                    print(f"✅ {señal}", flush=True)
+                    if enviar_por_telegram:
+                        try:
+                            enviar_mensaje(f"[Histórico] {señal}")
+                        except Exception as e:
+                            print(f"🔴 Telegram error: {e}", flush=True)
+
+    except Exception as e:
+        print(f"❌ Error al escanear histórico: {e}", flush=True)
 
        
 
