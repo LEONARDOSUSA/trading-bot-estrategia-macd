@@ -4,4 +4,4 @@ python-dotenv
 matplotlib
 ta
 alpaca-trade-api
-msgpack==1.0.7
+msgpack --only-binary=:all:
