@@ -8,8 +8,14 @@ from utils.telegram import enviar_mensaje
 def notificar_inicio():
     hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mensaje = f"✅ Bot MACD activo desde {hora_actual}. Escaneando rupturas intradía..."
+    print("🟡 Ejecutando notificar_inicio()")
     print(mensaje)
-    enviar_mensaje(mensaje)
+    try:
+        enviar_mensaje(mensaje)
+        print("🟢 Mensaje enviado con éxito.")
+    except Exception as e:
+        print(f"🔴 Error al enviar mensaje: {e}")
+
 
 # 🧭 Hacemos que Python reconozca las rutas relativas
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
