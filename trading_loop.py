@@ -150,7 +150,39 @@ while True:
             print(f"⚠️ Error con {ticker}: {e}", flush=True)
 
     time.sleep(60)
+def evaluar_ruptura_en_fecha(ticker, fecha_str, hora_str="11:20", timeframe="5Min", velas=200):
+    """
+    Evalúa si hubo una ruptura confirmada por MACD multiframe en una fecha y hora pasadas.
+    """
+    try:
+        objetivo = datetime.strptime(f"{fecha_str} {hora_str}", "%Y-%m-%d %H:%M")
+        momento = NY_TZ.localize(objetivo)
 
+        print(f"🔎 Analizando ruptura para {ticker} el {fecha_str} a las {hora_str}...", flush=True)
+
+        # Obtener datos históricos más extensos por si el horario está en medio de la sesión
+        bars = api.get_bars(symbol=ticker, timeframe=timeframe, limit=velas).df
+        if bars.empty:
+            print("❌ No se obtuvieron datos de Alpaca.")
+            return
+
+        df = bars[['open', 'high', 'low', 'close', 'volume']].copy()
+        df.index = df.index.tz_convert('America/New_York')
+
+        # Filtrar solo hasta el momento deseado
+        df_filtrado = df[df.index <= momento]
+        if df_filtrado.empty:
+            print("⛔ No hay datos anteriores al momento especificado.")
+            return
+
+        señal = evaluar_ruptura(ticker, df_filtrado)
+        if señal:
+            print(f"✅ Señal histórica: {señal}", flush=True)
+        else:
+            print(f"🟤 Sin ruptura confirmada para {ticker} en ese momento.", flush=True)
+
+    except Exception as e:
+        print(f"⚠️ Error en evaluación histórica: {e}", flush=True)
 
 
        
