@@ -9,7 +9,7 @@ def evaluar_ruptura(ticker, df):
     cuerpo = abs(ultimo['close'] - ultimo['open'])
     rango = ultimo['high'] - ultimo['low']
 
-    if cuerpo < 0.4 * rango:
+    if rango == 0 or cuerpo < 0.4 * rango:
         return False
 
     direccion = "CALL" if ultimo['close'] > ultimo['open'] else "PUT"
@@ -18,6 +18,7 @@ def evaluar_ruptura(ticker, df):
     confirmaciones = confirmar_macd_multiframe(ticker, momento, direccion)
 
     if confirmaciones["alineados"]:
-        return f"📈 Señal {direccion} confirmada en {ticker} ({momento.strftime('%H:%M')})"
+        hora = momento.strftime('%H:%M')
+        return f"📈 Señal {direccion} confirmada en {ticker} ({hora})"
 
     return False
