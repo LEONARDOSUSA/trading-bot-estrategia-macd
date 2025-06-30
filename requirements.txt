@@ -4,4 +4,4 @@ python-dotenv
 alpaca-trade-api
 technical-analysis==0.0.7
 websockets
-msgpack==1.0.7
+--only-binary=msgpack msgpack==1.0
