@@ -1,7 +1,7 @@
-pandas
 requests
+pandas
 python-dotenv
-matplotlib
-technical-analysis==0.0.7
 alpaca-trade-api
-msgpack --only-binary=:all:
+technical-analysis==0.0.7
+websockets
+msgpack==1.0.7
