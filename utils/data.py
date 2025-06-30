@@ -18,4 +18,3 @@ def obtener_datos(ticker, limit=100, timeframe="5Min"):
     except Exception as e:
         print(f"⚠️ Error al obtener datos de {ticker}: {e}", flush=True)
         return pd.DataFrame()
-       
