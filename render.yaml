@@ -2,7 +2,7 @@ services:
   - type: worker
     name: trading-bot-macd
     runtime: python
-    repo: https://github.com/LEONARDOSUSA/trading-bot-estrategia-macd
+    repo: https://github.com/LEONARDOSUSA/trading-bot-macd
     buildCommand: pip install -r requirements.txt
     startCommand: python trading_loop.py
     region: oregon
