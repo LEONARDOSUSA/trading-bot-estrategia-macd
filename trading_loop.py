@@ -1,19 +1,15 @@
 import os
-import sys
 import time
 from datetime import datetime, time as dtime
 from pytz import timezone
 
 from utils.telegram import enviar_mensaje
-from estrategias.evaluar_ruptura import evaluar_ruptura  # ✅ NUEVO EVALUADOR
+from estrategias.evaluar_ruptura import evaluar_ruptura
 from utils.data import obtener_datos
 
 print("📍 Inicio alcanzado", flush=True)
 
-# Zona horaria NY
 NY_TZ = timezone('America/New_York')
-
-# Horarios operativos (NY Time)
 HORA_INICIO = dtime(9, 48)
 HORA_CORTE = dtime(14, 0)
 
