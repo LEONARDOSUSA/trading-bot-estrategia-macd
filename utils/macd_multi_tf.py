@@ -5,10 +5,10 @@ import ta
 import pytz
 from datetime import timedelta
 
-# Configurar API Alpaca
 ALPACA_KEY = os.getenv("ALPACA_KEY")
 ALPACA_SECRET = os.getenv("ALPACA_SECRET")
 BASE_URL = "https://paper-api.alpaca.markets"
+
 api = tradeapi.REST(ALPACA_KEY, ALPACA_SECRET, base_url=BASE_URL)
 
 def obtener_macd_cruce(ticker, timeframe, momento, direccion="CALL"):
@@ -63,3 +63,4 @@ def _delta_timeframe(tf_str, n):
         return timedelta(minutes=15 * n)
     else:
         return timedelta(minutes=60)
+       
