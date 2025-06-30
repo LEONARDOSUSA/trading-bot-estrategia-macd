@@ -68,20 +68,17 @@ def obtener_macd_cruce(ticker, timeframe, momento, direccion="CALL"):
         print(f"⚠️ Error MACD {timeframe} en {ticker}: {e}", flush=True)
         return False
 
-# ⏳ Delta de tiempo por timeframe
 def _delta_timeframe(tf_str, n):
     return timedelta(minutes=n) if tf_str == "1Min" else (
            timedelta(minutes=5 * n) if tf_str == "5Min" else (
            timedelta(minutes=15 * n) if tf_str == "15Min" else timedelta(minutes=60)))
 
-# ✅ Confirmación multiframe
 def confirmar_macd_multiframe(ticker, momento, direccion):
     timeframes = ["1Min", "5Min", "15Min"]
     resultados = {tf: obtener_macd_cruce(ticker, tf, momento, direccion) for tf in timeframes}
     resultados["alineados"] = all(resultados.values())
     return resultados
 
-# 🎯 Evaluar ruptura técnica
 def evaluar_ruptura(ticker, df):
     if df is None or df.empty:
         return False
@@ -125,13 +122,19 @@ while True:
     ahora = datetime.now(NY_TZ).time()
 
     if ahora < HORA_INICIO:
-        time.sleep(30)
+        print("⏳ Antes del horario de apertura. Durmiendo...", flush=True)
+        time.sleep(60)
         continue
 
-    if ahora >= HORA_CORTE or not tickers_activos:
-        print("✅ Fin de jornada. Bot finalizado.", flush=True)
-        enviar_mensaje("📴 Bot MACD finalizado. Jornada concluida.")
-        break
+    if ahora >= HORA_CORTE:
+        print("🕓 Fuera de horario. Esperando próxima jornada...", flush=True)
+        time.sleep(300)  # Esperar 5 minutos
+        continue
+
+    if not tickers_activos:
+        print("✅ Todos los tickers procesados. Esperando siguiente oportunidad...", flush=True)
+        time.sleep(300)
+        continue
 
     for ticker in tickers_activos[:]:
         try:
@@ -147,3 +150,11 @@ while True:
             print(f"⚠️ Error con {ticker}: {e}", flush=True)
 
     time.sleep(60)
+
+
+
+       
+
+
+    
+            
