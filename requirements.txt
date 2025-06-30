@@ -2,6 +2,6 @@ pandas
 requests
 python-dotenv
 matplotlib
-ta
+technical-analysis==0.1.1
 alpaca-trade-api
 msgpack --only-binary=:all:
