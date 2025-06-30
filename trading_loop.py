@@ -188,17 +188,18 @@ def escanear_dia_historico(tickers, fecha_str="2025-06-28", timeframe="5Min", en
     Recorre un día completo del pasado y muestra todas las señales confirmadas por ruptura + MACD multiframe.
     """
     print(f"\n📅 Escaneando señales del {fecha_str}...\n", flush=True)
+    total_senales = 0
+
     try:
         fecha_base = NY_TZ.localize(datetime.strptime(fecha_str, "%Y-%m-%d"))
         horas = [dtime(h, m) for h in range(9, 15) for m in range(0, 60, 5)]
-        momentos = [datetime.combine(fecha_base.date(), h) for h in horas]
-        momentos = [NY_TZ.localize(m) for m in momentos if h >= dtime(9, 48) and h < dtime(14, 0)]
+        momentos = [NY_TZ.localize(datetime.combine(fecha_base.date(), h)) for h in horas if h >= dtime(9, 48) and h < dtime(14, 0)]
 
         for ticker in tickers:
-            print(f"\n🔍 {ticker}", flush=True)
+            print(f"\n🔍 {ticker}:", flush=True)
             bars = api.get_bars(ticker, timeframe=timeframe, limit=1000).df
             if bars.empty:
-                print("⛔ Sin datos")
+                print("⛔ Sin datos históricos.", flush=True)
                 continue
 
             df = bars[['open', 'high', 'low', 'close', 'volume']].copy()
@@ -210,22 +211,25 @@ def escanear_dia_historico(tickers, fecha_str="2025-06-28", timeframe="5Min", en
                     continue
 
                 señal = evaluar_ruptura(ticker, df_filtrado)
+                hora_str = momento.strftime('%H:%M')
+
                 if señal:
-                    print(f"✅ {señal}", flush=True)
+                    total_senales += 1
+                    mensaje = f"✅ [{hora_str}] {señal}"
+                    print(mensaje, flush=True)
+
                     if enviar_por_telegram:
                         try:
                             enviar_mensaje(f"[Histórico] {señal}")
                         except Exception as e:
-                            print(f"🔴 Telegram error: {e}", flush=True)
+                            print(f"🔴 Error al enviar a Telegram: {e}", flush=True)
+                else:
+                    print(f"· [{hora_str}] sin señal", flush=True)
+
+        print(f"\n🔚 Escaneo finalizado. Total de señales: {total_senales}\n", flush=True)
 
     except Exception as e:
         print(f"❌ Error al escanear histórico: {e}", flush=True)
-
-
-# 👇 Desde aquí en adelante son herramientas opcionales, no producción
-
-# Para escanear todas las señales confirmadas de un día histórico:
-# ⚠️ Solo descomentá cuando quieras hacer el análisis
 
 escanear_dia_historico(
      tickers=["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"],
