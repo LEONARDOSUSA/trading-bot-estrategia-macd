@@ -15,10 +15,16 @@ def evaluar_ruptura(ticker, df):
         signal_actual = df['signal'].iloc[-1]
         macd_prev = df['macd'].iloc[-2]
         signal_prev = df['signal'].iloc[-2]
+        precio = df['close'].iloc[-1]
 
         if macd_prev < signal_prev and macd_actual > signal_actual:
-            mensaje = f"{ticker} → Señal de entrada (MACD cruzando al alza)"
-            print(f"📈 Ruptura detectada en {ticker}", flush=True)
+            mensaje = (
+                f"📈 Ruptura detectada: {ticker}\n"
+                f"🟢 Tipo: CALL (MACD cruzando al alza)\n"
+                f"💵 Precio de disparo: ${precio:.2f}\n"
+                f"🕒 Timeframe: 5Min"
+            )
+            print(f"📊 Señal detectada en {ticker}", flush=True)
             return mensaje
         else:
             print(f"🔍 Sin señal clara en {ticker}", flush=True)
@@ -27,5 +33,4 @@ def evaluar_ruptura(ticker, df):
     except Exception as e:
         print(f"❌ Error en evaluación de {ticker}: {e}", flush=True)
         return None
-
-    
+  
