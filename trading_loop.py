@@ -227,11 +227,10 @@ def escanear_dia_historico(tickers, fecha_str="2025-06-28", timeframe="5Min", en
 # Para escanear todas las señales confirmadas de un día histórico:
 # ⚠️ Solo descomentá cuando quieras hacer el análisis
 
-# escanear_dia_historico(
-#     tickers=["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"],
-#     fecha_str="2025-06-28",
-#     enviar_por_telegram=True
-# )
+escanear_dia_historico(
+     tickers=["AAPL", "SPY", "TSLA", "MSFT", "NVDA", "AMD", "META"],
+    fecha_str="2025-06-28",
+   enviar_por_telegram=True )
        
 
 
