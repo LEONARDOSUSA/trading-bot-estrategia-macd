@@ -10,7 +10,7 @@ api = tradeapi.REST(ALPACA_KEY, ALPACA_SECRET, base_url=BASE_URL)
 
 def obtener_datos(ticker, limit=100, timeframe="5Min"):
     try:
-        bars = api.get_stock_bars(ticker, timeframe).df.tail(limit)
+        bars = api.get_bars(ticker, timeframe, limit=limit).df
         df = bars[['open', 'high', 'low', 'close', 'volume']].copy()
         df = df.reset_index(drop=True)
         print(f"✅ Datos cargados para {ticker} ({len(df)} velas)", flush=True)
